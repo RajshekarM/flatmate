@@ -1,0 +1,80 @@
+import TodayTasks from '../components/TodayTasks';
+import UpcomingTasks from '../components/UpcomingTasks';
+import { generateUpcomingChoreAssignments } from '../utils/generateUpcomingChoreAssignments';
+import { getChoresForToday } from '../utils/getChoresForToday';
+import type { ChoreAssignment } from '../types';
+import AdminAnnouncements from '../components/AdminAnnouncements';
+import MissedChores from '../components/MissedChores';
+import WeekOverview from '../components/WeekOverview';
+
+import dayjs from 'dayjs';
+import OnDemandAlerts from '../components/OnDemandAlerts';
+import { useState } from 'react';
+import type { OnDemandChore } from '../types';
+
+
+// Dashboard.tsx
+const mockAssignments: ChoreAssignment[] = [
+  {
+    choreTitle: 'Clean Kitchen',
+    memberId: 'm1',
+    assignedTo: 'Saturday',
+    frequency: 'biweekly',
+    type: 'weekday',
+  },
+  {
+    choreTitle: 'Clean Hall',
+    memberId: 'm1',
+    assignedTo: 'Saturday',
+    frequency: 'biweekly',
+    type: 'weekday',
+  },
+  {
+    choreTitle: 'Clean Washroom',
+    memberId: 'm1',
+    assignedTo: '2025-06-15',
+    frequency: 'none',
+    type: 'date',
+  },
+];
+const adminNotes = [
+  "Please clean the hallway before Sunday.",
+  "Guests visiting Friday — kitchen must be spotless."
+];
+
+
+export default function Dashboard() {
+  const currentUserId = 'm1'; // replace with real auth later
+  const todaysChores = getChoresForToday(mockAssignments, currentUserId);
+  const upcomingChoreAssignments = generateUpcomingChoreAssignments(mockAssignments);
+  const currentDate = dayjs().format('YYYY-MM-DD');
+  
+  const mockOnDemandChores:OnDemandChore[] = [
+  {
+    id: 'trash',
+    name: 'Take out Trash',
+    lastAssignedTo: 'm2',
+    triggered: true, // show alert if true
+    triggeredAt: '2025-06-17T07:00:00',alertCount:0,
+      alertRecipients:[],
+
+  },
+];
+  const [onDemandChores, setOnDemandChores] = useState(mockOnDemandChores);
+
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen space-y-6 text-black">
+      <h1 className="text-3xl font-bold text-gray-800">🏠 FlatChores Dashboard</h1>
+    
+      <AdminAnnouncements messages={adminNotes} />
+      <TodayTasks chores={todaysChores} />
+      <UpcomingTasks chores={upcomingChoreAssignments} />
+      <OnDemandAlerts chores={onDemandChores} currentUserId="Divya" />
+      <MissedChores chores={mockAssignments} currentDate={currentDate} />
+      <WeekOverview chores={mockAssignments} currentUserId="m1" />
+
+
+    </div>
+  );
+}
