@@ -6,6 +6,8 @@ Flatmates is not just another chore app — it’s your intelligent housemate. P
 Then it uses that knowledge to assign tasks fairly, adaptively, and naturally — whether through smart rotation, personalized recommendations, or simple voice commands like “I finished the bathroom.”
 With AI at its core, Flatmates turns shared living into smooth living — no arguments, no repeats, no hassle.
 
+I put my heart in developing this app. This helped me and would love to see help you :)
+
 ## 🚀 Key Features
 
 ### 🔧 1. Task Assignment Optimization (Recommendation System)
