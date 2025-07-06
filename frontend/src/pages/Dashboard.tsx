@@ -2,7 +2,7 @@ import TodayTasks from '../components/TodayTasks';
 import UpcomingTasks from '../components/UpcomingTasks';
 import { generateUpcomingChoreAssignments } from '../utils/generateUpcomingChoreAssignments';
 import { getChoresForToday } from '../utils/getChoresForToday';
-import type { ChoreAssignment } from '../types';
+import type { choreAssignment } from '../types';
 import AdminAnnouncements from '../components/AdminAnnouncements';
 import MissedChores from '../components/MissedChores';
 import WeekOverview from '../components/WeekOverview';
@@ -14,13 +14,15 @@ import type { OnDemandChore } from '../types';
 
 
 // Dashboard.tsx
-const mockAssignments: ChoreAssignment[] = [
+
+const mockAssignments: choreAssignment[] = [
   {
     choreTitle: 'Clean Kitchen',
     memberId: 'm1',
     assignedTo: 'Saturday',
     frequency: 'biweekly',
     type: 'weekday',
+    scheduleId:'2'
   },
   {
     choreTitle: 'Clean Hall',
@@ -28,6 +30,7 @@ const mockAssignments: ChoreAssignment[] = [
     assignedTo: 'Saturday',
     frequency: 'biweekly',
     type: 'weekday',
+    scheduleId:'2'
   },
   {
     choreTitle: 'Clean Washroom',
@@ -35,8 +38,10 @@ const mockAssignments: ChoreAssignment[] = [
     assignedTo: '2025-06-15',
     frequency: 'none',
     type: 'date',
+    scheduleId:'2'
   },
 ];
+
 const adminNotes = [
   "Please clean the hallway before Sunday.",
   "Guests visiting Friday — kitchen must be spotless."
@@ -68,8 +73,8 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold text-gray-800">🏠 FlatChores Dashboard</h1>
     
       <AdminAnnouncements messages={adminNotes} />
-      <TodayTasks chores={todaysChores} />
-      <UpcomingTasks chores={upcomingChoreAssignments} />
+      <TodayTasks todaysChores={todaysChores} currentUserId="Divya"/>
+      <UpcomingTasks assignemnts={upcomingChoreAssignments} currentUserId="Divya" />
       <OnDemandAlerts chores={onDemandChores} currentUserId="Divya" />
       <MissedChores chores={mockAssignments} currentDate={currentDate} />
       <WeekOverview chores={mockAssignments} currentUserId="m1" />

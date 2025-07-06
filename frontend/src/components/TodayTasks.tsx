@@ -1,18 +1,65 @@
-import { useState } from 'react';
-import type { ChoreAssignment } from '../types';
+import { useEffect, useState } from 'react';
+import type { choreAssignment } from '../types';
 
-interface Props {
-  chores: ChoreAssignment[];
+interface todayTaskProps {
+  todaysChores: choreAssignment[];
+  currentUserId: string;
 }
+export default function TodayTasks({ todaysChores, currentUserId }: todayTaskProps) {
+  const [taskList, setTaskList] = useState<choreAssignment[]>(todaysChores);
+  const [isLoading, setIsLoading] = useState(false);
 
-export default function TodayTasks({ chores }: Props) {
-  const [taskList, setTaskList] = useState<ChoreAssignment[]>(chores);
+  
+  const triggerRotation = async (scheduleId:string) => {
+  try {
+    const res = await fetch(`/api/timed/rotate/${scheduleId}`, {
+      method: 'POST'
+    });
 
-  const toggleCompletion = (index: number) => {
+    const data = await res.json();
+
+    if (res.ok) {
+      console.log('✅ Rotation completed:', data);
+      // Optional: Toast or refresh UI
+    } else {
+      console.warn('⚠️ Rotation skipped:', data.error);
+    }
+  } catch (err) {
+    console.error('❌ Failed to trigger rotation:', err);
+  }
+};
+
+  useEffect(() => {
+  if (taskList.length > 0 && taskList.every(task => task.completed)) {
+    // ✅ All tasks appear complete, notify backend
+    const scheduleId = taskList[0].scheduleId
+    triggerRotation(scheduleId);
+  }
+}, [taskList]);
+
+
+  const toggleCompletion = async (index: number) => {
     const updated = [...taskList];
-    updated[index].completed = !updated[index].completed;
-    setTaskList(updated);
+    const task = updated[index];
+    const newStatus = !task.completed;
+
+    try {
+      const response = await fetch(`/api/timed/${task.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: newStatus }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update task');
+
+      updated[index] = { ...task, completed: newStatus };
+      setTaskList(updated);
+    } catch (err) {
+      console.error('❌ Error updating task:', err);
+      alert('Failed to update chore status. Please try again.');
+    }
   };
+
 
   return (
     <div className="bg-white p-4 rounded-xl shadow">

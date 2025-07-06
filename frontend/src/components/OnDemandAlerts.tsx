@@ -8,7 +8,7 @@ interface OnDemandAlertsProps {
 
 
 
-const OnDemandAlerts = ({ chores, currentUserId='Divya' }: OnDemandAlertsProps) => {
+const OnDemandAlerts = ({ chores, currentUserId }: OnDemandAlertsProps) => {
 
   const groupMembers = ['Raj', 'Anita', 'Divya'];
 

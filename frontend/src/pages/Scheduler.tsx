@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ManualAssignmentForm from '../components/ManualAssignmentForm';
+import type { Group } from '../types';
+import { toast } from 'react-toastify';
 
 
 export default function Scheduler() {
@@ -9,7 +11,10 @@ const [isCreating, setIsCreating] = useState(false);
 const [newSchedule, setNewSchedule] = useState({
   name: '',
   type: 'weekly',
+  startDate: '',      // <-- add if not already present
+  groupId: '',        // <-- new
 });
+
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const members = [
@@ -30,16 +35,71 @@ const chores = [
   { id: 'c5', title: 'Kitchen South' },
 
 ];
+const [currentGroup, setCurrentGroup] = useState<Group>( {
+  id: 1,
+  name: 'EdenCommoms',
+  members: [],
+})
 
-const handleManualSubmit = (assignments: {
-  choreId: string;
-  memberId: string;
-  assignedTo: string;
-  frequency: string;
-  type: 'date' | 'weekday';
-}[]) => {
+useEffect(() => {
+  if (currentGroup) {
+    setNewSchedule((prev) => ({ ...prev, groupId: currentGroup.id }));
+  }
+}, [currentGroup]);
+
+const handleManualSubmit = async (
+  assignments: {
+    choreId: string;
+    memberId: string;
+    assignedTo: string;
+    frequency: string;
+    type: 'date' | 'weekday';
+  }[]
+) => {
   console.log('✅ Assignment submitted:', assignments);
-  // TODO: Send this array to backend
+
+  try {
+    // 1. Create the schedule
+    const response = await fetch('/api/schedules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSchedule), // make sure this includes groupId
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create schedule');
+    }
+
+    const created = await response.json();
+    console.log('✅ Schedule created:', created);
+
+    // 2. Post the assignments with scheduleId attached
+    const scheduledAssignments = assignments.map((a) => ({
+      ...a,
+      scheduleId: created._id,
+    }));
+
+    const assignResponse = await fetch('/api/timed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assignments: scheduledAssignments }),
+    });
+
+    if (!assignResponse.ok) {
+      throw new Error('Failed to save assignments');
+    }
+
+    const assigned = await assignResponse.json();
+    console.log('✅ Assignments saved:', assigned);
+
+    // 🧼 Optional: reset form, show toast, etc.
+  } catch (error) {
+    console.error('❌ Submission failed:', error);
+    // Optionally show user error feedback
+  }
+  setNewSchedule({ name: '', type: 'weekly', startDate: '', groupId: currentGroup?.id || '' });
+  toast.success?.('Schedule and assignments saved!') || alert('✅ Schedule and assignments saved!');
+
 };
 
   return (

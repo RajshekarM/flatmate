@@ -1,11 +1,4 @@
-export interface ChoreAssignment {
-  choreTitle: string;
-  memberId: string;
-  assignedTo: string;
-  frequency: 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
-  type: 'date' | 'weekday';
-  completed?: boolean; // Optional flag
-}
+
 export interface Member {
   id: string;
   name: string;
@@ -39,5 +32,17 @@ export interface OnDemandChore {
   alertRecipients: string[];    // current notification targets
 }
 
-
+export interface choreAssignment {
+  id?: string;
+  scheduleId: string;           // ✅ REQUIRED
+  choreTitle: string;
+  choreId?: string;
+  memberId?: string;
+  assignedTo?: string;
+  frequency?: 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
+  type?: 'date' | 'weekday';
+  date?: string;                // e.g., '2025-06-20'
+  weekday?: string;             // e.g., 'Monday'
+  completed?: boolean;
+}
 
