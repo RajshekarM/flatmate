@@ -96,6 +96,6 @@ MIT License
 
 ---
 
-## 🙌 Built by [Rajashekar Mudigonda] 4 the benefit of students
+## 🙌 Built by *Rajashekar Mudigonda*
 
 Bringing AI into daily life — one chore at a time.
