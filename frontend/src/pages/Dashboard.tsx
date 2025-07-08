@@ -1,3 +1,6 @@
+import { useAuth } from "../context/AuthContext";
+
+
 import TodayTasks from '../components/TodayTasks';
 import UpcomingTasks from '../components/UpcomingTasks';
 import { generateUpcomingChoreAssignments } from '../utils/generateUpcomingChoreAssignments';
@@ -14,6 +17,7 @@ import type { OnDemandChore } from '../types';
 
 
 // Dashboard.tsx
+
 
 const mockAssignments: choreAssignment[] = [
   {
@@ -49,7 +53,8 @@ const adminNotes = [
 
 
 export default function Dashboard() {
-  const currentUserId = 'm1'; // replace with real auth later
+  const { username: currentUserId } = useAuth();
+  const {isLoggedIn} = useAuth()
   const todaysChores = getChoresForToday(mockAssignments, currentUserId);
   const upcomingChoreAssignments = generateUpcomingChoreAssignments(mockAssignments);
   const currentDate = dayjs().format('YYYY-MM-DD');
@@ -69,17 +74,29 @@ export default function Dashboard() {
 
 
   return (
+
     <div className="p-6 bg-gray-50 min-h-screen space-y-6 text-black">
       <h1 className="text-3xl font-bold text-gray-800">🏠 FlatChores Dashboard</h1>
-    
-      <AdminAnnouncements messages={adminNotes} />
-      <TodayTasks todaysChores={todaysChores} currentUserId="Divya"/>
-      <UpcomingTasks assignemnts={upcomingChoreAssignments} currentUserId="Divya" />
-      <OnDemandAlerts chores={onDemandChores} currentUserId="Divya" />
+
+      {isLoggedIn?(
+      <>
+      <AdminAnnouncements messages={adminNotes} /> 
+      <TodayTasks todaysChores={todaysChores} currentUserId={currentUserId}/>
+      <UpcomingTasks assignemnts={upcomingChoreAssignments} currentUserId={currentUserId} />
+      <OnDemandAlerts chores={onDemandChores} currentUserId={currentUserId} />
       <MissedChores chores={mockAssignments} currentDate={currentDate} />
-      <WeekOverview chores={mockAssignments} currentUserId="m1" />
+      <WeekOverview chores={mockAssignments} currentUserId={currentUserId} />
+      </>
+  ):
+  (
+  <div className="bg-blue-50 p-4 rounded-md border border-blue-200 mt-6 text-center text-blue-700">
+    <p className="text-lg font-semibold">Log in to see your upcoming tasks and alerts 🚀</p>
+    <p className="text-sm mt-2">Stay on top of your responsibilities and never miss a chore.</p>
+  </div>
+)}
 
-
+    
+      
     </div>
   );
 }
