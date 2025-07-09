@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { ScheduledAssignmentModel } from '../models/assignments';
+import { ScheduledAssignmentModel } from '../models/scheduledAssignment';
 import { ScheduleModel } from '../models/schedule';
-
+import { GroupModel } from '../models/groups';
 const router = express.Router();
 
 /**

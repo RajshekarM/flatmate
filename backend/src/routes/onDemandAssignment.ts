@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { OnDemandAssignmentModel } from '../models/assignments';
+import { OnDemandAssignmentModel } from '../models/onDemandAssignment';
 
 const router = express.Router();
 
