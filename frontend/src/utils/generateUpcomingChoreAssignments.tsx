@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import type { choreAssignment } from '../types';
 
-export function generateUpcomingChoreAssignments(assignments: choreAssignment[]): choreAssignment[] {
+export function fetchUpcomingChores(assignments: choreAssignment[]): choreAssignment[] {
   const today = dayjs();
   const todayDate = today.format('YYYY-MM-DD');
   const todayWeekday = today.format('dddd');

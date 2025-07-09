@@ -1,8 +1,42 @@
 import dayjs from 'dayjs';
-import type { ChoreAssignment } from '../types';
+import type { choreAssignment } from '../types';
 
-export function getChoresForToday(assignments: ChoreAssignment[], currentUserId: string): ChoreAssignment[] {
+const mockAssignments: choreAssignment[] = [
+  {
+    choreTitle: 'Clean Kitchen',
+    memberId: 'm1',
+    assignedTo: 'Saturday',
+    frequency: 'biweekly',
+    type: 'weekday',
+    scheduleId:'2'
+  },
+  {
+    choreTitle: 'Clean Hall',
+    memberId: 'm1',
+    assignedTo: 'Saturday',
+    frequency: 'biweekly',
+    type: 'weekday',
+    scheduleId:'2'
+  },
+  {
+    choreTitle: 'Clean Washroom',
+    memberId: 'm2',
+    assignedTo: '2025-06-15',
+    frequency: 'none',
+    type: 'date',
+    scheduleId:'2'
+  },
+];
+
+
+export function fetchChores()
+{
+  return mockAssignments
+}
+
+export function fetchTodayChores(assignments: choreAssignment[], currentUserId: string): choreAssignment[] {
   const today = dayjs();
+  console.log(currentUserId)
   const todayDate = today.format('YYYY-MM-DD');
   const todayWeekday = today.format('dddd');
 

@@ -3,8 +3,9 @@ import { useAuth } from "../context/AuthContext";
 
 import TodayTasks from '../components/TodayTasks';
 import UpcomingTasks from '../components/UpcomingTasks';
-import { generateUpcomingChoreAssignments } from '../utils/generateUpcomingChoreAssignments';
-import { getChoresForToday } from '../utils/getChoresForToday';
+import { fetchChores } from '../utils/getChoresForToday';
+import { fetchUpcomingChores } from '../utils/generateUpcomingChoreAssignments';
+import { fetchTodayChores } from '../utils/getChoresForToday';
 import type { choreAssignment } from '../types';
 import AdminAnnouncements from '../components/AdminAnnouncements';
 import MissedChores from '../components/MissedChores';
@@ -12,13 +13,11 @@ import WeekOverview from '../components/WeekOverview';
 
 import dayjs from 'dayjs';
 import OnDemandAlerts from '../components/OnDemandAlerts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { OnDemandChore } from '../types';
 
 
 // Dashboard.tsx
-
-
 const mockAssignments: choreAssignment[] = [
   {
     choreTitle: 'Clean Kitchen',
@@ -46,18 +45,66 @@ const mockAssignments: choreAssignment[] = [
   },
 ];
 
+
 const adminNotes = [
   "Please clean the hallway before Sunday.",
   "Guests visiting Friday — kitchen must be spotless."
 ];
 
-
 export default function Dashboard() {
-  const { username: currentUserId } = useAuth();
+  const [chores, setChores] = useState<choreAssignment[]>([]);
+  const [todaysChores, setTodaysChores] = useState<choreAssignment[]>([]);
+  const [upcomingChores, setUpcomingChores] = useState<choreAssignment[]>([]);
+  const [reRender, setReRender] = useState(false)
+  const {username: currentUserId} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const {isLoggedIn} = useAuth()
-  const todaysChores = getChoresForToday(mockAssignments, currentUserId);
-  const upcomingChoreAssignments = generateUpcomingChoreAssignments(mockAssignments);
   const currentDate = dayjs().format('YYYY-MM-DD');
+
+const reFresh = ()=>{
+    setReRender(true)
+  }
+const fetchTasks = async (inputChores: choreAssignment[]) => {
+  console.log(inputChores);
+
+  const today: choreAssignment[] = await fetchTodayChores(inputChores, currentUserId);
+  const upcoming: choreAssignment[] = await fetchUpcomingChores(today);
+
+  setTodaysChores(today);
+  setUpcomingChores(upcoming);
+};
+const loadData = async ()=>{
+    setIsLoading(true);
+    setError(null);
+    try {
+    const fetchedChores: choreAssignment[] = await fetchChores();
+    setChores(fetchedChores);
+    fetchTasks(fetchedChores);}
+    catch (err) {
+    console.error('❌ Failed to load data:', err);
+    setError('Failed to load chores. Please try again.');}
+    finally {
+    setIsLoading(false);}
+  }
+
+useEffect(() => {
+  const init = async () => {
+    await loadData()
+  };
+  init();
+}, []);
+
+useEffect(() => {
+  if (reRender) {
+    loadData() // ← your data loader
+    setReRender(false);   // reset after refresh
+  }
+}, [reRender]);
+
+
+
+  
   
   const mockOnDemandChores:OnDemandChore[] = [
   {
@@ -74,15 +121,19 @@ export default function Dashboard() {
 
 
   return (
-
     <div className="p-6 bg-gray-50 min-h-screen space-y-6 text-black">
       <h1 className="text-3xl font-bold text-gray-800">🏠 FlatChores Dashboard</h1>
-
+      {isLoading && <p className="text-gray-500 italic">Loading chores...</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {isLoggedIn?(
       <>
       <AdminAnnouncements messages={adminNotes} /> 
-      <TodayTasks todaysChores={todaysChores} currentUserId={currentUserId}/>
-      <UpcomingTasks assignemnts={upcomingChoreAssignments} currentUserId={currentUserId} />
+      <TodayTasks 
+        onReRender ={reFresh} 
+        todaysChores={todaysChores} 
+        currentUserId={currentUserId}
+        />
+      <UpcomingTasks assignemnts={upcomingChores} currentUserId={currentUserId} />
       <OnDemandAlerts chores={onDemandChores} currentUserId={currentUserId} />
       <MissedChores chores={mockAssignments} currentDate={currentDate} />
       <WeekOverview chores={mockAssignments} currentUserId={currentUserId} />

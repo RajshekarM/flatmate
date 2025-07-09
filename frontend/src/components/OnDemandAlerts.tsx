@@ -12,7 +12,7 @@ const OnDemandAlerts = ({ chores, currentUserId }: OnDemandAlertsProps) => {
 
   const groupMembers = ['Raj', 'Anita', 'Divya'];
 
-  console.log(currentUserId)
+
 
   const [onDemandChores, setOnDemandChores] = useState<OnDemandChore[]>([
     {

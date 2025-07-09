@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import type { choreAssignment } from '../types';
 
 interface todayTaskProps {
+  onReRender: ()=> void,
   todaysChores: choreAssignment[];
   currentUserId: string;
 }
-export default function TodayTasks({ todaysChores, currentUserId }: todayTaskProps) {
+export default function TodayTasks({ onReRender , todaysChores, currentUserId }: todayTaskProps) {
   const [taskList, setTaskList] = useState<choreAssignment[]>(todaysChores);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,6 +22,7 @@ export default function TodayTasks({ todaysChores, currentUserId }: todayTaskPro
     if (res.ok) {
       console.log('✅ Rotation completed:', data);
       // Optional: Toast or refresh UI
+      onReRender()
     } else {
       console.warn('⚠️ Rotation skipped:', data.error);
     }
